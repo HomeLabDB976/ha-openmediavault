@@ -1,0 +1,18 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "OpenMediaVault",
+        "description": "Connect to your OpenMediaVault server",
+        "data": {
+          "host": "Server address",
+          "username": "Username",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Unable to connect to OpenMediaVault"
+    }
+  }
+}

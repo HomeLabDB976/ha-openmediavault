@@ -1,0 +1,13 @@
+{
+  "domain": "openmediavault",
+  "name": "OpenMediaVault",
+  "version": "0.0.1",
+  "documentation": "https://github.com/HomeLabDB976/ha-openmediavault",
+  "issue_tracker": "https://github.com/HomeLabDB976/ha-openmediavault/issues",
+  "config_flow": true,
+  "iot_class": "local_polling",
+  "requirements": [
+    "aiohttp>=3.11.0"
+    "voluptuous"
+  ]
+}
