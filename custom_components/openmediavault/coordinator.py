@@ -1,36 +1,41 @@
+import logging
 from datetime import timedelta
 
 from homeassistant.helpers.update_coordinator import (
     DataUpdateCoordinator,
+    UpdateFailed,
 )
 
-from homeassistant.core import HomeAssistant
+from .const import DOMAIN
 
-from .api import OpenMediaVaultAPI
-from .const import DOMAIN, SCAN_INTERVAL
+_LOGGER = logging.getLogger(__name__)
 
 
 class OpenMediaVaultCoordinator(DataUpdateCoordinator):
 
-    def __init__(
-        self,
-        hass: HomeAssistant,
-        api: OpenMediaVaultAPI,
-    ):
+    def __init__(self, hass, api):
         self.api = api
 
         super().__init__(
             hass,
-            hass.helpers.event,
+            _LOGGER,
             name=DOMAIN,
-            update_interval=timedelta(seconds=SCAN_INTERVAL),
+            update_interval=timedelta(seconds=60),
         )
 
     async def _async_update_data(self):
+        try:
+            response = await self.api.call(
+                "System",
+                "getInformation",
+            )
 
-        system = await self.api.call(
-            "System",
-            "getInformation"
-        )
+            if response.get("error"):
+                raise Exception(response["error"])
 
-        return system["response"]
+            return response["response"]
+
+        except Exception as err:
+            raise UpdateFailed(
+                f"Error communicating with OpenMediaVault: {err}"
+            ) from err

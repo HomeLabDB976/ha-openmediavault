@@ -6,6 +6,7 @@ from .const import DOMAIN
 
 
 async def async_setup_entry(hass, entry, async_add_entities):
+
     coordinator = hass.data[DOMAIN][entry.entry_id]
 
     async_add_entities(
@@ -28,85 +29,56 @@ class OMVBaseSensor(CoordinatorEntity, SensorEntity):
     def device_info(self):
         return DeviceInfo(
             identifiers={
-                (DOMAIN, "openmediavault_nas")
+                (DOMAIN, self.coordinator.api.host)
             },
             name="OpenMediaVault NAS",
             manufacturer="OpenMediaVault",
-            model="OpenMediaVault Server",
-        )
-
-    @property
-    def available(self):
-        return (
-            self.coordinator.last_update_success
-            and self.coordinator.data is not None
+            model="NAS Server",
         )
 
 
 class OMVCPUSensor(OMVBaseSensor):
 
-    _attr_unique_id = "openmediavault_cpu_usage"
     _attr_name = "CPU Usage"
-    _attr_icon = "mdi:cpu-64-bit"
     _attr_native_unit_of_measurement = "%"
 
     @property
     def native_value(self):
         return round(
-            self.coordinator.data.get(
-                "cpuUtilization",
-                0
-            ) * 100,
+            self.coordinator.data["cpuUtilization"] * 100,
             1,
         )
 
 
 class OMVMemorySensor(OMVBaseSensor):
 
-    _attr_unique_id = "openmediavault_memory_usage"
     _attr_name = "Memory Usage"
-    _attr_icon = "mdi:memory"
     _attr_native_unit_of_measurement = "%"
 
     @property
     def native_value(self):
         return round(
-            float(
-                self.coordinator.data.get(
-                    "memUtilization",
-                    0
-                )
-            ) * 100,
+            float(self.coordinator.data["memUtilization"]) * 100,
             1,
         )
 
 
 class OMVUptimeSensor(OMVBaseSensor):
 
-    _attr_unique_id = "openmediavault_uptime"
     _attr_name = "Uptime"
-    _attr_icon = "mdi:clock-outline"
     _attr_native_unit_of_measurement = "s"
 
     @property
     def native_value(self):
         return round(
-            self.coordinator.data.get(
-                "uptime",
-                0
-            )
+            self.coordinator.data["uptime"]
         )
 
 
 class OMVUpdatesSensor(OMVBaseSensor):
 
-    _attr_unique_id = "openmediavault_available_updates"
     _attr_name = "Available Updates"
-    _attr_icon = "mdi:update"
 
     @property
     def native_value(self):
-        return self.coordinator.data.get(
-            "availablePkgUpdates",
-            0
-        )
+        return self.coordinator.data["availablePkgUpdates"]
